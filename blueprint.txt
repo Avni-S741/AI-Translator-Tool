@@ -1,0 +1,17 @@
+AI Translator App
+
+-Dropdown menus for language choice...(click to choose)
+        >Translate from:
+        >Translate to:
+-Option for mic or text...(click to choose)
+-If user choose mic, An output box to show recorded text...
+-A Translator button...
+-Translated text shown to screen with speech of Translated text...  
+-'Start new translation' button...
+
+
+~Libraries used~
+
+Speech_recognition:to recognize speech from user
+googletrans:to translate from one language into another
+gtts:'google text to speech'  to hear translated text 
