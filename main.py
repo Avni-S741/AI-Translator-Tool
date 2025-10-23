@@ -1,6 +1,6 @@
 import streamlit as st
 import speech_recognition as sr
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 from gtts import gTTS
 import os
 
@@ -108,11 +108,40 @@ languages = {
     "German": "de",
     "English": "en",
     "Korean": "ko",
+    "Mandarin": "chinese(simplified)",
+    "Japanese": "ja",
+    "Spanish": "es",
+    "French": "fr",
+}
+
+lang_for_gtts= {
+    "Hindi": "hi",
+    "Arabic": "ar",
+    "Urdu": "ur",
+    "Russian":"ru",
+    "Italian":"it",
+    "Portuguese":"pt",
+    "Dutch":"nl",
+    "Turkish":"tr",
+    "Thai":"th",
+    "Vietnamese":"vi",
+    "Bengali":"bn",
+    "Punjabi":"pa",
+    "Gujarati":"gu",
+    "Tamil":"ta",
+    "Telugu":"te",
+    "Marathi":"mr",
+    "Swahili":"sw",
+    "Filipino":"tl",
+    "German": "de",
+    "English": "en",
+    "Korean": "ko",
     "Mandarin": "zh-cn",
     "Japanese": "ja",
     "Spanish": "es",
     "French": "fr",
 }
+
 
 languages = dict(sorted(languages.items()))
 
@@ -142,19 +171,20 @@ elif input_type == "speech":
                 user_input=""
 
 #actual translating work
-translator=Translator()
+translator=GoogleTranslator(source=languages[lang_from],target=languages[lang_to])
 if user_input:
     #translator sends text inside user input to google translation engine...googletrans extracts the actual translated text...and .text make it accessible...
-    translated_text=translator.translate(user_input,src=languages[lang_from],dest=languages[lang_to]).text
+    translated_text=translator.translate(user_input)
 st.success(translated_text)
 
 #speech of translated text....
 if translated_text: #if translated text is not empty then execute the code below this
     try:  
-        speech=gTTS(translated_text,lang=languages[lang_to]) #'speech' now stores what to speak and in what language BUT NOT ACTUAL AUDIO
+        speech=gTTS(translated_text,lang=lang_for_gtts[lang_to]) #'speech' now stores what to speak and in what language BUT NOT ACTUAL AUDIO
         audiofile="translated-audio.mp3" # made an audio file to store audio later
         speech.save(audiofile) #here speech(value inside speech variable) is getting generated as an actual audio inside audiofile
         st.audio(audiofile) #streamlit here plays the actual audio generated inside audiofile  
     
     except:   
+
         st.write("Unsupported language: Sorry, We can't provide you audio of this language....")
