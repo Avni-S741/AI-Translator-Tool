@@ -100,6 +100,15 @@ languages = {
     "Bengali":"bn",
     "Punjabi":"pa",
     "Gujarati":"gu",
+     "Indonesian": "id",
+    "Greek": "el",
+    "Polish": "pl",
+    "Romanian": "ro",
+    "Czech": "cs",
+    "Hungarian": "hu",
+    "Finnish": "fi",
+    "Swedish": "sv",
+    "Norwegian": "no"
     "Tamil":"ta",
     "Telugu":"te",
     "Marathi":"mr",
@@ -128,6 +137,15 @@ lang_for_gtts= {
     "Bengali":"bn",
     "Punjabi":"pa",
     "Gujarati":"gu",
+     "Indonesian": "id",
+    "Greek": "el",
+    "Polish": "pl",
+    "Romanian": "ro",
+    "Czech": "cs",
+    "Hungarian": "hu",
+    "Finnish": "fi",
+    "Swedish": "sv",
+    "Norwegian": "no"
     "Tamil":"ta",
     "Telugu":"te",
     "Marathi":"mr",
@@ -188,3 +206,4 @@ if translated_text: #if translated text is not empty then execute the code below
     except:   
 
         st.write("Unsupported language: Sorry, We can't provide you audio of this language....")
+
