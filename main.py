@@ -174,8 +174,9 @@ input_type=st.radio("Choose input type:",("Text","Speech")).lower()
 st.write("You chose:",input_type)
 
 #action according to input type
+ user_input=""
 if input_type == "text":
-    user_input=""
+   
     user_input = st.text_area("Enter your text:") 
 elif input_type == "speech":
      r=sr.Recognizer() #creates a recognizer object which will later be used as 'r'...
@@ -230,6 +231,7 @@ if translated_text: #if translated text is not empty then execute the code below
     except:   
 
         st.write("Unsupported language: Sorry, We can't provide you audio of this language....")
+
 
 
 
