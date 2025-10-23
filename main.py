@@ -1,6 +1,7 @@
 import streamlit as st
 import speech_recognition as sr
 from deep_translator import GoogleTranslator
+from streamlit_webrtc import webrtc_streamer, WebRtcMode
 from gtts import gTTS
 import os
 
@@ -176,18 +177,38 @@ st.write("You chose:",input_type)
 if input_type == "text":
     user_input = st.text_area("Enter your text:") 
 elif input_type == "speech":
-    if st.button("Record"): #if record button is pressed
-        r=sr.Recognizer() #a class which listens and understand your audio using different functions
-        with sr.Microphone() as source: #class that access your computer's microphone
-            st.write("listening...")
-            audio=r.listen(source) #records audio 
-            try:
-                user_input=r.recognize_google(audio) #sends audio to google API and recieve it in text form for further processing
-                st.write("You said:",user_input)
-            except:
-                st.write("Sorry...we didn't get it...")
-                user_input=""
+     r=sr.Recognizer() #creates a recognizer object which will later be used as 'r'...
 
+     st.write("Click below to start recording your voice:")
+     if st.button("Record"): 
+        st.info("Recording started... speak now!")
+
+         # webrtc_ctx creates a live channel between the browser and app....
+        webrtc_ctx = webrtc_streamer(
+            key="speech",
+            mode=WebRtcMode.SENDRECV, # tells function that we want to send and recieve audio...
+            audio_receiver_size=1024, #specify audio size....
+            media_stream_constraints={"audio": True, "video": False}, # enable audio and disable video since we only need audio....
+        )
+        user_input = "" # initialize user_input as empty
+
+        if webrtc_ctx.audio_receiver:# checks if audio reciever is active...
+             audio = webrtc_ctx.audio_receiver.get_audio() # collect audio.... 
+             if audio is not None: #checks if audio is not empty/full silence....
+        
+              audio_data = sr.AudioData(audio.tobytes(), 
+                                        sample_rate=webrtc_ctx.sample_rate,
+                                        sample_width=2
+                                        )
+        
+             try:
+                user_input = r.recognize_google(audio_data) # sends your audio to google and recieve text from it.... 
+                st.success(f"You said: {user_input}")
+             except sr.UnknownValueError:
+                st.error("Sorry...we didn't get it...")
+             except sr.RequestError:
+                st.error("Speech recognition service unavailable.")
+                 
 #actual translating work
 translator=GoogleTranslator(source=languages[lang_from],target=languages[lang_to])
 if user_input:
@@ -206,6 +227,7 @@ if translated_text: #if translated text is not empty then execute the code below
     except:   
 
         st.write("Unsupported language: Sorry, We can't provide you audio of this language....")
+
 
 
 
