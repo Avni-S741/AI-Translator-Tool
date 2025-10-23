@@ -217,6 +217,7 @@ if user_input:
 st.success(translated_text)
 
 #speech of translated text....
+translated_text = ""  # empty string to start
 if translated_text: #if translated text is not empty then execute the code below this
     try:  
         speech=gTTS(translated_text,lang=lang_for_gtts[lang_to]) #'speech' now stores what to speak and in what language BUT NOT ACTUAL AUDIO
@@ -227,6 +228,7 @@ if translated_text: #if translated text is not empty then execute the code below
     except:   
 
         st.write("Unsupported language: Sorry, We can't provide you audio of this language....")
+
 
 
 
