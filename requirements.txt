@@ -1,7 +1,7 @@
-streamlit
-deep_translator
-speech_recognition
-streamlit_webrtc
-os
-gtts
-httpx
+streamlit==1.25.0
+streamlit-webrtc==0.54.0
+rich==14.2.0
+numpy
+speechrecognition
+gTTS
+deep-translator
