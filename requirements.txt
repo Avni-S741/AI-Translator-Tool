@@ -1,7 +1,7 @@
-gtts
 streamlit
-speechrecognition
-deep-translator
+deep_translator
+speech_recognition
+streamlit_webrtc
+os
+gtts
 httpx
-
-
