@@ -210,6 +210,7 @@ elif input_type == "speech":
                 st.error("Speech recognition service unavailable.")
                  
 #actual translating work
+translated_text = ""  # empty string to start
 translator=GoogleTranslator(source=languages[lang_from],target=languages[lang_to])
 if user_input:
     #translator sends text inside user input to google translation engine...googletrans extracts the actual translated text...and .text make it accessible...
@@ -217,7 +218,7 @@ if user_input:
 st.success(translated_text)
 
 #speech of translated text....
-translated_text = ""  # empty string to start
+
 if translated_text: #if translated text is not empty then execute the code below this
     try:  
         speech=gTTS(translated_text,lang=lang_for_gtts[lang_to]) #'speech' now stores what to speak and in what language BUT NOT ACTUAL AUDIO
@@ -228,6 +229,7 @@ if translated_text: #if translated text is not empty then execute the code below
     except:   
 
         st.write("Unsupported language: Sorry, We can't provide you audio of this language....")
+
 
 
 
