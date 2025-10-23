@@ -108,7 +108,7 @@ languages = {
     "Hungarian": "hu",
     "Finnish": "fi",
     "Swedish": "sv",
-    "Norwegian": "no"
+    "Norwegian": "no",
     "Tamil":"ta",
     "Telugu":"te",
     "Marathi":"mr",
@@ -206,4 +206,5 @@ if translated_text: #if translated text is not empty then execute the code below
     except:   
 
         st.write("Unsupported language: Sorry, We can't provide you audio of this language....")
+
 
