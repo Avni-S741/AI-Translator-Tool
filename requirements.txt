@@ -4,7 +4,8 @@ SpeechRecognition==3.10.0
 gTTS==2.5.1
 deep-translator==1.11.4
 numpy==1.26.4
-rich==14.2.0
+rich==13.7.1
 soundfile==0.12.1
+
 
 
