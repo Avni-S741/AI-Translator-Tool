@@ -1,9 +1,10 @@
 import streamlit as st
 import speech_recognition as sr
+import sounddevice as sd
+import wavio
 from deep_translator import GoogleTranslator
-from streamlit_webrtc import webrtc_streamer, WebRtcMode
 from gtts import gTTS
-import os
+import io
 
 
 st.set_page_config(page_title="AI Translator Tool", page_icon="💬", layout="centered")
@@ -87,8 +88,8 @@ st.markdown("<p class='subtitle'><i>Smart translation at your fingertips🌸....
 
 
 #languages dictionary for reference
-languages = {
-    "Hindi": "hi",
+languages =   {
+     "Hindi": "hi",
     "Arabic": "ar",
     "Urdu": "ur",
     "Russian":"ru",
@@ -101,7 +102,11 @@ languages = {
     "Bengali":"bn",
     "Punjabi":"pa",
     "Gujarati":"gu",
-     "Indonesian": "id",
+    "Tamil":"ta",
+    "Telugu":"te",
+    "Marathi":"mr",
+    "Swahili":"sw",
+    "Indonesian": "id",
     "Greek": "el",
     "Polish": "pl",
     "Romanian": "ro",
@@ -110,22 +115,18 @@ languages = {
     "Finnish": "fi",
     "Swedish": "sv",
     "Norwegian": "no",
-    "Tamil":"ta",
-    "Telugu":"te",
-    "Marathi":"mr",
-    "Swahili":"sw",
     "Filipino":"tl",
-    "German": "de",
+     "German": "de",
     "English": "en",
     "Korean": "ko",
-    "Mandarin": "chinese(simplified)",
+    "Mandarin": "chinese (simplified)",
     "Japanese": "ja",
     "Spanish": "es",
-    "French": "fr",
+    "French": "fr"
 }
 
-lang_for_gtts= {
-    "Hindi": "hi",
+lang_for_gtts={
+     "Hindi": "hi",
     "Arabic": "ar",
     "Urdu": "ur",
     "Russian":"ru",
@@ -138,7 +139,11 @@ lang_for_gtts= {
     "Bengali":"bn",
     "Punjabi":"pa",
     "Gujarati":"gu",
-     "Indonesian": "id",
+    "Tamil":"ta",
+    "Telugu":"te",
+    "Marathi":"mr",
+    "Swahili":"sw",
+    "Indonesian": "id",
     "Greek": "el",
     "Polish": "pl",
     "Romanian": "ro",
@@ -147,21 +152,15 @@ lang_for_gtts= {
     "Finnish": "fi",
     "Swedish": "sv",
     "Norwegian": "no",
-    "Tamil":"ta",
-    "Telugu":"te",
-    "Marathi":"mr",
-    "Swahili":"sw",
     "Filipino":"tl",
-    "German": "de",
+     "German": "de",
     "English": "en",
     "Korean": "ko",
     "Mandarin": "zh-cn",
     "Japanese": "ja",
     "Spanish": "es",
-    "French": "fr",
+    "French": "fr"
 }
-
-
 languages = dict(sorted(languages.items()))
 
 
@@ -173,54 +172,59 @@ lang_to=st.selectbox("Translate to:",list(languages.keys()))
 input_type=st.radio("Choose input type:",("Text","Speech")).lower()
 st.write("You chose:",input_type)
 
+
+if "user_input" not in st.session_state:
+    st.session_state.user_input = ""
+if "recording" not in st.session_state:
+    st.session_state.recording = False
+
 #action according to input type
 user_input=""
+
 if input_type == "text":
-   
-    user_input = st.text_area("Enter your text:") 
-elif input_type == "speech":
-     r=sr.Recognizer() #creates a recognizer object which will later be used as 'r'...
-
-     st.write("Click below to start recording your voice:")
-     if st.button("Record"): 
-        st.info("Recording started... speak now!")
-
-         # webrtc_ctx creates a live channel between the browser and app....
-        webrtc_ctx = webrtc_streamer(
-            key="speech",
-            mode=WebRtcMode.SENDRECV, # tells function that we want to send and recieve audio...
-            audio_receiver_size=1024, #specify audio size....
-            media_stream_constraints={"audio": True, "video": False}, # enable audio and disable video since we only need audio....
-        )
-        user_input = "" # initialize user_input as empty
-
-        if webrtc_ctx.audio_receiver:# checks if audio reciever is active...
-             audio = webrtc_ctx.audio_receiver.get_audio() # collect audio.... 
-             if audio is not None: #checks if audio is not empty/full silence....
+    user_input = st.text_area("Enter your text:", user_input)
+elif input_type == "Speech":
+    st.write("Press the button to record your voice:")
+    
+    if st.button("Record (5 sec)"):
+        st.info("Recording... speak now!")
+        duration = 5  # seconds
+        fs = 44100    # sample rate
         
-              audio_data = sr.AudioData(audio.tobytes(), 
-                                        sample_rate=webrtc_ctx.sample_rate,
-                                        sample_width=2
-                                        )
+        recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
+        sd.wait()
         
-             try:
-                user_input = r.recognize_google(audio_data) # sends your audio to google and recieve text from it.... 
-                st.success(f"You said: {user_input}")
-             except sr.UnknownValueError:
-                st.error("Sorry...we didn't get it...")
-             except sr.RequestError:
-                st.error("Speech recognition service unavailable.")
-                 
+        # Save to buffer
+        wav_io = io.BytesIO()
+        wavio.write("temp.wav", recording, fs, sampwidth=2)
+        with open("temp.wav", "rb") as f:
+            wav_io.write(f.read())
+        wav_io.seek(0)
+        
+        # Speech recognition
+        r = sr.Recognizer()
+        audio_data = sr.AudioFile("temp.wav")
+        with audio_data as source:
+            audio = r.record(source)
+        try:
+            user_input = r.recognize_google(audio)
+            st.success(f"You said: {user_input}")
+        except sr.UnknownValueError:
+            st.error("Could not understand audio")
+        except sr.RequestError:
+            st.error("Speech recognition service unavailable.")
+
+
 #actual translating work
 translated_text = ""  # empty string to start
 if st.button("Translate"):
+
     translator=GoogleTranslator(source=languages[lang_from],target=languages[lang_to])
     if user_input:
+
         #translator sends text inside user input to google translation engine...googletrans extracts the actual translated text...and .text make it accessible...
         translated_text=translator.translate(user_input)
         st.success(translated_text)
-    else:
-        st.warning("Please enter text or use the mic before translating.")
 
 #speech of translated text....
 
@@ -232,15 +236,4 @@ if translated_text: #if translated text is not empty then execute the code below
         st.audio(audiofile) #streamlit here plays the actual audio generated inside audiofile  
     
     except:   
-
-        st.write("Unsupported language: Sorry, We can't provide you audio of this language....")
-
-
-
-
-
-
-
-
-
-
+        st.write("Unsupported language: Sorry, We can't provide you audio for this language....")
