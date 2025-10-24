@@ -219,7 +219,7 @@ if st.button("Translate"):
         #translator sends text inside user input to google translation engine...googletrans extracts the actual translated text...and .text make it accessible...
         translated_text=translator.translate(user_input)
         st.success(translated_text)
-     else:
+    else:
         st.warning("Please enter text or use the mic before translating.")
 
 #speech of translated text....
@@ -234,6 +234,7 @@ if translated_text: #if translated text is not empty then execute the code below
     except:   
 
         st.write("Unsupported language: Sorry, We can't provide you audio of this language....")
+
 
 
 
