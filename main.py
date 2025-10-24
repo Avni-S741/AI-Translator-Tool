@@ -174,7 +174,7 @@ input_type=st.radio("Choose input type:",("Text","Speech")).lower()
 st.write("You chose:",input_type)
 
 #action according to input type
- user_input=""
+user_input=""
 if input_type == "text":
    
     user_input = st.text_area("Enter your text:") 
@@ -213,11 +213,14 @@ elif input_type == "speech":
                  
 #actual translating work
 translated_text = ""  # empty string to start
-translator=GoogleTranslator(source=languages[lang_from],target=languages[lang_to])
-if user_input:
-    #translator sends text inside user input to google translation engine...googletrans extracts the actual translated text...and .text make it accessible...
-    translated_text=translator.translate(user_input)
-st.success(translated_text)
+if st.button("Translate"):
+    translator=GoogleTranslator(source=languages[lang_from],target=languages[lang_to])
+    if user_input:
+        #translator sends text inside user input to google translation engine...googletrans extracts the actual translated text...and .text make it accessible...
+        translated_text=translator.translate(user_input)
+        st.success(translated_text)
+     else:
+        st.warning("Please enter text or use the mic before translating.")
 
 #speech of translated text....
 
@@ -231,6 +234,7 @@ if translated_text: #if translated text is not empty then execute the code below
     except:   
 
         st.write("Unsupported language: Sorry, We can't provide you audio of this language....")
+
 
 
 
