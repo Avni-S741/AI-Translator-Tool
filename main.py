@@ -169,20 +169,18 @@ lang_from=st.selectbox("Translate from:",list(languages.keys()))
 lang_to=st.selectbox("Translate to:",list(languages.keys()))
 
 #using .radio to choose input type
-input_type=st.radio("Choose input type:",("Text","Speech")).lower()
+input_type=st.radio("Choose input type:",("Text","Speech"))
 st.write("You chose:",input_type)
 
-
-if "user_input" not in st.session_state:
-    st.session_state.user_input = ""
-if "recording" not in st.session_state:
-    st.session_state.recording = False
+if "spoken_text" not in st.session_state:
+    st.session_state.spoken_text = ""
 
 #action according to input type
 user_input=""
 
-if input_type == "text":
+if input_type == "Text":
     user_input = st.text_area("Enter your text:", user_input)
+    st.session_state.spoken_text = user_input
 elif input_type == "Speech":
     st.write("Press the button to record your voice:")
     
@@ -208,6 +206,7 @@ elif input_type == "Speech":
             audio = r.record(source)
         try:
             user_input = r.recognize_google(audio)
+            st.session_state.spoken_text = user_input
             st.success(f"You said: {user_input}")
         except sr.UnknownValueError:
             st.error("Could not understand audio")
@@ -216,15 +215,16 @@ elif input_type == "Speech":
 
 
 #actual translating work
-translated_text = ""  # empty string to start
+translated_text=""
 if st.button("Translate"):
-
-    translator=GoogleTranslator(source=languages[lang_from],target=languages[lang_to])
-    if user_input:
-
-        #translator sends text inside user input to google translation engine...googletrans extracts the actual translated text...and .text make it accessible...
-        translated_text=translator.translate(user_input)
-        st.success(translated_text)
+    if st.session_state.spoken_text.strip() != "":
+        try:
+            translated_text = GoogleTranslator(source=languages[lang_from], target=languages[lang_to]).translate(st.session_state.spoken_text)
+            st.success(f"🔤 Translated Text: {translated_text}")
+        except Exception as e:
+            st.error(f"Translation failed: {e}")
+    else:
+        st.warning("⚠️ Please record or enter text first!")
 
 #speech of translated text....
 
