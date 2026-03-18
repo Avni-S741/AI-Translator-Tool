@@ -231,9 +231,14 @@ if st.button("Translate"):
 if translated_text: #if translated text is not empty then execute the code below this
     try:  
         speech=gTTS(translated_text,lang=lang_for_gtts[lang_to]) #'speech' now stores what to speak and in what language BUT NOT ACTUAL AUDIO
-        audiofile="translated-audio.mp3" # made an audio file to store audio later
-        speech.save(audiofile) #here speech(value inside speech variable) is getting generated as an actual audio inside audiofile
-        st.audio(audiofile) #streamlit here plays the actual audio generated inside audiofile  
-    
+        audio_bytes = io.BytesIO()
+        speech.write_to_fp(audio_bytes)
+        audio_bytes.seek(0)
+        st.audio(audio_bytes)
     except:   
         st.write("Unsupported language: Sorry, We can't provide you audio for this language....")
+
+    st.markdown("---")
+    if st.button("🔄 Start New Translation"):
+        st.session_state.spoken_text = ""
+        st.rerun()
